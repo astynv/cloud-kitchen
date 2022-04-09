@@ -1,0 +1,158 @@
+type Query {
+    test: String!,
+    getUser: User,
+    getBonusPoints: Int,
+    getMenu: [MenuItem!]!,
+    getAddresses: [Address!]!,
+    getCards: [CreditCard!]!,
+    isRestaurantWorking: Boolean!,
+    getHistory: [Order!]!,
+
+    getActivityStatus: Boolean!,
+    getBusyStatus: Boolean!, 
+    getCookTasks: [CookTask!]!,
+    getCourierTask: CourierTask,
+}
+
+type Mutation {
+    editUser(user: UserEditInput!) : User,
+    registerUser(user: UserInput!) : UserType!,
+    loginUser(credentials: LoginInput!) : UserType!,
+    logoutUser: Int,
+    addAddress(address: AddressInput!) : Address,
+    makeOrder(order: OrderInput!) : Int!,
+    addCard(card: CreditCardInput!) : CreditCard!,
+
+    setActivityStatus(status: Boolean!): Boolean!,
+    setBusyStatus(status: Boolean!): Boolean!,
+    setCookTaskStatus(orderId: Int!, itemId: Int!, status: CookTaskStatus!) : CookTaskStatus!,
+    finishCourierTask(orderId: Int!) : Int!,
+}
+
+# Операции с пользователем
+
+type User {
+    name:  String!,
+    email: String!,
+}
+
+enum UserType {
+    CUSTOMER
+    COOK
+    COURIER
+}
+
+input UserEditInput {
+    name:     String,
+    email:    String,
+    password: String,
+}
+
+input UserInput {
+    name:     String!,
+    email:    String!,
+    password: String!
+}
+
+input LoginInput {
+    email:    String!,
+    password: String!,
+}
+
+input AddressInput {
+    street:   String!,
+    building: String!,
+    room:     String,
+}
+
+type Address {
+    id: Int!,
+
+    street:   String!,
+    building: String!,
+    room:     String,
+}
+
+# Просмотр меню
+
+type MenuItem {
+    id:       Int!,
+    title:    String!,
+    price:    Int!,    # в копейках
+    calories: Float!,
+}
+
+# Заказы
+
+input OrderItemInput {
+    itemId: Int!,
+    amount: Int!,
+}
+
+input OrderInput {
+    addressId: Int!,
+    comment:   String,
+
+    items: [OrderItemInput!]!
+}
+
+enum OrderStatus {
+    COOKING
+    DELIVERING
+    DONE
+}
+
+type OrderItem {
+    item:   MenuItem!,
+    amount: Int!,
+}
+
+type Order {
+    id:      Int!,
+    shownId: Int!,
+    status:  OrderStatus!,
+    address: Address!,
+    comment: String,
+
+    items: [OrderItem!]!
+}
+
+# Карты
+
+type CreditCard {
+    id:             Int!,
+    lastFourDigits: String!,
+}
+
+input CreditCardInput {
+    cardNumber: String!,
+    expires:    String!,
+    cvv:        String!,
+    holderName: String!,
+}
+
+# Работники ресторана
+
+enum CookTaskStatus {
+    NEW
+    IN_PROGRESS
+    READY
+}
+
+type CookTask {
+    orderId:      Int!,
+    itemId:       Int!,
+    status:       CookTaskStatus!,
+
+    orderShownId: Int!,
+    mealTitle:    String!,
+    amount:       Int!,
+}
+
+# Курьеры
+
+type CourierTask {
+    orderId: Int!,
+    orderShownId: Int!,
+    address: Address!,
+}
